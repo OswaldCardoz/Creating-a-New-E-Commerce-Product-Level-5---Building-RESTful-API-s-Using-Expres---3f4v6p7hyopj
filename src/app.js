@@ -22,8 +22,11 @@ app.post('/api/v1/products', (req, res) => {
       throw new Error('Invalid product data. Please provide name, price, and quantity.');
     }
 
-    // Generate a new id by incrementing the id of the last product
-    const newProductId = products.length ? products[products.length - 1].id + 1 : 1;
+    // Find the maximum id currently in use
+    const maxId = products.reduce((max, product) => (product.id > max ? product.id : max), 0);
+
+    // Generate a new id by incrementing the maximum id
+    const newProductId = maxId + 1;
 
     // Create a new product object
     const newProduct = {
@@ -55,6 +58,7 @@ app.post('/api/v1/products', (req, res) => {
     });
   }
 });
+
 // GET endpoint for sending the details of users
 app.get('/api/v1/products', (req,res) => {
     res.status(200).json({
