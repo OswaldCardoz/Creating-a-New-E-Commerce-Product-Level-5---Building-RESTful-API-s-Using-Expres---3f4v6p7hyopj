@@ -15,7 +15,7 @@ app.use(express.json())
 app.post('/api/v1/products', (req, res) => {
     const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
     const { name, price, quantity } = req.body;
-
+    
     // Validate the product data
     if (!name || !price || !quantity) {
         return res.status(400).json({
@@ -36,22 +36,15 @@ app.post('/api/v1/products', (req, res) => {
     products.push(newProduct);
 
     // Update the products.json file with the new data
-    fs.writeFile(`${__dirname}/data/products.json`, JSON.stringify(products, null, 2), (err) => {
-        if (err) {
-            return res.status(500).json({
-                status: 'failed',
-                message: 'Internal Server Error'
-            });
-        }
+    fs.writeFileSync(`${__dirname}/data/products.json`, JSON.stringify(products, null, 2));
 
-        // Respond with a success message and the newly created product
-        res.status(201).json({
-            status: 'Success',
-            message: 'Product added successfully',
-            data: {
-                newProduct
-            }
-        });
+    // Respond with a success message and the newly created product
+    res.status(201).json({
+        status: 'Success',
+        message: 'Product added successfully',
+        data: {
+            newProduct
+        }
     });
 });
 
