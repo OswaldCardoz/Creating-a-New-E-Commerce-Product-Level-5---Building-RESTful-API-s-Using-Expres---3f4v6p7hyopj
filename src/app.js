@@ -13,50 +13,46 @@ app.use(express.json())
 // Write POST endpoint for creating new product here
 // Endpoint /api/v1/products
 app.post('/api/v1/products', (req, res) => {
-  try {
-    // Retrieve product data from the request body
+    const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
     const { name, price, quantity } = req.body;
 
-    // Validate product data
+    // Validate the product data
     if (!name || !price || !quantity) {
-      throw new Error('Invalid product data. Please provide name, price, and quantity.');
+        return res.status(400).json({
+            status: 'failed',
+            message: 'Invalid product data. Please provide name, price, and quantity.'
+        });
     }
 
-    // Find the maximum id currently in use
-    const maxId = products.reduce((max, product) => (product.id > max ? product.id : max), 0);
-
-    // Generate a new id by incrementing the maximum id
-    const newProductId = maxId + 1;
-
-    // Create a new product object
+    // Create the new product
     const newProduct = {
-      id: newProductId,
-      name,
-      price,
-      quantity,
+        id: newId,
+        name,
+        price,
+        quantity
     };
 
     // Add the new product to the products array
     products.push(newProduct);
 
-    // Update the products in the JSON file
-    fs.writeFileSync(`${__dirname}/data/products.json`, JSON.stringify(products, null, 2));
+    // Update the products.json file with the new data
+    fs.writeFile(`${__dirname}/data/products.json`, JSON.stringify(products, null, 2), (err) => {
+        if (err) {
+            return res.status(500).json({
+                status: 'failed',
+                message: 'Internal Server Error'
+            });
+        }
 
-    // Return the newly created product with a success status
-    res.status(201).json({
-      status: 'success',
-      message: 'Product added successfully',
-      data: {
-        newProduct,
-      },
+        // Respond with a success message and the newly created product
+        res.status(201).json({
+            status: 'Success',
+            message: 'Product added successfully',
+            data: {
+                newProduct
+            }
+        });
     });
-  } catch (error) {
-    // Send an error response if an exception occurs
-    res.status(400).json({
-      status: 'failed',
-      message: error.message,
-    });
-  }
 });
 
 // GET endpoint for sending the details of users
