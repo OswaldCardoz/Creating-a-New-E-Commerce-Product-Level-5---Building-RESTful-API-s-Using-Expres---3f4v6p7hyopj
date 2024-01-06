@@ -13,7 +13,7 @@ app.use(express.json())
 // Write POST endpoint for creating new product here
 // Endpoint /api/v1/products
 app.post('/api/v1/products', (req, res) => {
-    const newId = products.length > 0 ? products[products.length - 1].id + 1 : 1;
+    const newId =  products[products.length - 1].id + 1;;
     const { name, price, quantity } = req.body;
     
     // Validate the product data
